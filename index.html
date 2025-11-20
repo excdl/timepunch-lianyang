@@ -308,7 +308,16 @@ async function performClockIn(status, customDate="", customTime="", isMakeup=fal
     }
     requestAnimationFrame(animate);
 
-    // === API 請求並立即彈窗 ===
+    // === 先立即彈窗「打卡中...」提示 ===
+    Swal.fire({
+        icon: "info",
+        title: isMakeup ? "補打卡中..." : "打卡中...",
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    // === API 請求 ===
     let data;
     try {
         const res = await fetch(API_ENDPOINT, {
@@ -320,7 +329,7 @@ async function performClockIn(status, customDate="", customTime="", isMakeup=fal
         data = { message:"失敗" };
     }
 
-    // 立即跳出結果
+    // === 更新 Swal 內容為結果 ===
     if(data.message.includes("成功") && COMPANY_IPS.includes(ip)) {
         Swal.fire({ icon:"success", title:"🎉 打卡成功！", html:`<strong>打卡時間：</strong> ${data.date} ${data.time}`, showConfirmButton:false, timer:3500 });
     } else if(data.message.includes("成功")) {
@@ -329,10 +338,9 @@ async function performClockIn(status, customDate="", customTime="", isMakeup=fal
         Swal.fire({ icon:"error", title:"😥 今日已打卡", html:"重複打卡", showConfirmButton:false, timer:3000 });
     }
 
-    // 300ms 後隱藏動畫，動畫仍可持續顯示一段時間
+    // 動畫可繼續跑一段時間
     setTimeout(() => { wrapper.style.display = "none"; }, 300);
 
-    // 更新今日打卡紀錄
     updateTodayRecords();
 }
 
