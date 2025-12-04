@@ -407,10 +407,16 @@ document.getElementById("btnApprove").onclick = () => {
     window.location.href = "https://script.google.com/macros/s/AKfycbyxXrvVxfgwrI-SdXM03QEYxEpG-xqyjVQcxdNz1IBK3DtFC-kUFjHhRaNtgXNU-Mdu/exec";
 };
 
-// ===== 初始化 =====
+// 🔧 修改：加入等待 userReady 才讀今日紀錄
 window.onload = async () => {
     await updateUserInfo();
-    await updateTodayRecords();
+
+    const waitUser = setInterval(() => {
+        if (window.userReady) {
+            clearInterval(waitUser);
+            updateTodayRecords();   // 🔧 現在 userId 已確保可用
+        }
+    }, 100);
 };
 </script>
 
