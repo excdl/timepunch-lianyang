@@ -436,11 +436,20 @@ document.getElementById("btnApprove").onclick = () => {
     window.location.href = "https://script.google.com/macros/s/AKfycbyxXrvVxfgwrI-SdXM03QEYxEpG-xqyjVQcxdNz1IBK3DtFC-kUFjHhRaNtgXNU-Mdu/exec";
 };
 
-// ===== 初始化 =====
+
+// ===== 初始化：等待使用者資訊載入後才讀取紀錄 =====
 window.onload = async () => {
     await updateUserInfo();
-    await updateTodayRecords();
+
+    // 🔥 等到 userReady = true 才能查詢今日打卡紀錄
+    const waitUser = setInterval(() => {
+        if (window.userReady) {
+            clearInterval(waitUser);
+            updateTodayRecords();  // ← 現在 userId 已確定，可以查資料
+        }
+    }, 100);
 };
+
 
 </script>
 
