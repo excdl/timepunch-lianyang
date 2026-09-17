@@ -523,9 +523,18 @@ function showClockLoading(titleText = "打卡中", subText = "正在確認打卡
 }
 
 async function sendSelfMessage(record) {
+    if (!liff.isInClient()) {
+        return;
+    }
+
+    let headerColor = "#3498db";
+    if (record.status === "下班") headerColor = "#2ecc71";
+    if (record.netType !== "公司網路") headerColor = "#e67e22";
+
+    const reasonText =
+        record.netType !== "公司網路" ? "異常原因：非公司網路" : "";
+
     try {
-        if (typeof liff === "undefined" || !liff.isInClient()) return;
-        const headerColor = record.status === "下班" ? "#2ecc71" : "#3498db";
         await liff.sendMessages([{
             type: "flex",
             altText: `【打卡通知】${record.status}成功`,
@@ -534,7 +543,13 @@ async function sendSelfMessage(record) {
                 header: {
                     type: "box",
                     layout: "vertical",
-                    contents: [{ type: "text", text: `${record.userName} 已打卡`, weight: "bold", size: "lg", color: "#ffffff" }],
+                    contents: [{
+                        type: "text",
+                        text: `${String(record.userName)} 已打卡`,
+                        weight: "bold",
+                        size: "lg",
+                        color: "#ffffff"
+                    }],
                     backgroundColor: headerColor,
                     paddingAll: "12px"
                 },
@@ -543,18 +558,18 @@ async function sendSelfMessage(record) {
                     layout: "vertical",
                     spacing: "md",
                     contents: [
-                        { type: "text", text: `狀態：${record.status}`, size: "md" },
-                        { type: "text", text: `時間：${record.date} ${record.time}`, size: "md" },
-                        { type: "text", text: `網路：${record.netType}`, size: "md" }
+                        { type: "text", text: `狀態：${String(record.status)}`, size: "md" },
+                        { type: "text", text: `時間：${String(record.date)} ${String(record.time)}`, size: "md" },
+                        { type: "text", text: `網路：${String(record.netType)}`, size: "md" },
+                        ...(reasonText ? [{ type: "text", text: reasonText, size: "md", color: "#e67e22" }] : [])
                     ]
                 }
             }
         }]);
-    } catch (error) {
-        console.warn("LINE 訊息傳送失敗，不影響打卡結果:", error);
+    } catch (err) {
+        console.error("LINE 訊息傳送失敗:", err);
     }
 }
-
 async function updateTodayRecords(showLoading = false) {
     if (!window.userId) return;
     try {
