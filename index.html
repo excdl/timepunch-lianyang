@@ -55,6 +55,7 @@ body {
     width: 46px;
     height: 46px;
     border-radius: 50%;
+    overflow: hidden;
     background: linear-gradient(135deg, #6c5ce7, #a29bfe);
     display: flex;
     align-items: center;
@@ -444,7 +445,7 @@ async function updateStatus() {
 }
 
 async function initUser() {
-    await liff.init({ liffId: "2008520938-4018BD8v" });
+    await liff.init({ liffId: "2008538866-zDXM53Ao" });
     if (!liff.isLoggedIn()) {
         await liff.login();
         return;
