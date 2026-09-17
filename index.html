@@ -504,23 +504,42 @@ function getTodayString() {
     return `${y}/${m}/${d}`;
 }
 
-function showClockLoading(titleText = "打卡中", subText = "正在確認打卡資料，請稍候...") {
-    Swal.fire({
-        html: `
-            <div style="padding:15px 0;text-align:center;">
-                <div style="width:50px; height:50px; margin:0 auto 18px auto; border:4px solid #f3f3f3; border-top:4px solid #3498db; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
-                <h3 style="margin:0 0 8px 0; color:#2c3e50; font-size:20px; font-weight:bold;">${escapeHtml(titleText)}</h3>
-                <p style="margin:0; color:#7f8c8d; font-size:14px;">${escapeHtml(subText)}</p>
-                <style> @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } } </style>
-            </div>
-        `,
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        backdrop: "rgba(0,0,0,0.5)",
-        customClass: { popup: "custom-swal-popup" }
-    });
+function showClockSuccess(apiData, status, isMakeup, isCompany) {
+    if (isCompany) {
+        Swal.fire({
+            icon: "success",
+            title: isMakeup ? "🎉 補打卡成功！" : "🎉 打卡成功！",
+            html: `
+                <div style="font-size:16px; margin-top:8px;">
+                    <strong>打卡時間：</strong><br>
+                    <span style="color:#2980b9; font-size:18px; font-weight:bold;">
+                        ${apiData.date} ${apiData.time}
+                    </span>
+                </div>
+            `,
+            showConfirmButton: false,
+            timer: 2000,
+            backdrop: "rgba(0,0,0,0.5)",
+            customClass: { popup: "custom-swal-popup" }
+        });
+    } else {
+        Swal.fire({
+            icon: "warning",
+            title: "⚠ 非公司網路",
+            html: `
+                <div style="font-size:16px; color:#3498db; font-weight:bold; margin-top:8px;">
+                    ◎ 異地打卡成功 ◎
+                </div><br>
+                <small>打卡時間：${apiData.date} ${apiData.time}</small>
+            `,
+            showConfirmButton: false,
+            timer: 2500,
+            backdrop: "rgba(0,0,0,0.5)",
+            customClass: { popup: "custom-swal-popup" }
+        });
+    }
 }
+
 
 async function sendSelfMessage(record) {
     if (!liff.isInClient()) {
